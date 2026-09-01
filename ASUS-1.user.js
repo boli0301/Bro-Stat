@@ -2,7 +2,7 @@
 // @name            华硕路由器增强
 // @name:en         Bro-Stat-ASUS
 // @namespace       ucxn
-// @version         5.9.6
+// @version         5.9.7-beta
 // @description     哥哥科技 QQ群 680464365
 // @description:en  https://github.com/ucxn/Bro-Stat
 // @author          哥哥科技 space.bilibili.com/501430041
@@ -292,7 +292,7 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
           uB: CONFIG.readSaveData === 1 ? 0 : (spD ? cC.offUp - (spD.up || 0) : cC.offUp), 
           dB: CONFIG.readSaveData === 1 ? 0 : (spD ? cC.offDn - (spD.down || 0) : cC.offDn),
           lU: cC.offUp, lD: cC.offDn, aR: !1, dpU: 0, dpD: 0,
-          oU: cC.offUp, oD: cC.offDn, hU: new Float64Array(64), hD: new Float64Array(64), hIdx: 0
+          oU: cC.offUp, oD: cC.offDn, name: spD?.name || cC.name || m, hU: new Float64Array(64), hD: new Float64Array(64), hIdx: 0
         };
         let cS = S.cls[m], dU = cC.offUp - cS.lU, dD = cC.offDn - cS.lD;
         if (dU < 0 || dD < 0) {
@@ -313,6 +313,7 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
         else if (cC.upRate > 0) { let eU = cC.upRate * CONFIG.lanRefreshInterval * 0.5; cS.intUp += eU; cS.zEU = (cS.zEU || 0) + eU; cS.zUC = (cS.zUC || 0) + 1; }
         if (cS.dnR > 0) { cS.intDn += (cS.dnR + cC.dnRate) * ms * 0.0005; }
         else if (cC.dnRate > 0) { let eD = cC.dnRate * CONFIG.lanRefreshInterval * 0.5; cS.intDn += eD; cS.zED = (cS.zED || 0) + eD; cS.zDC = (cS.zDC || 0) + 1; }
+        if (cC.name && cC.name !== '华硕设备') cS.name = cC.name;
         cS.upR = cC.upRate; cS.dnR = cC.dnRate; cS.lUT = n;
         cS.lU = cC.offUp; cS.lD = cC.offDn; cS.lT = n;
       }
@@ -509,7 +510,7 @@ S.rTick = ((S.rTick || 0) + 1) & 3;
       global: { wan_up: S.wTotUp, wan_down: S.wTotDn, lan_integral_up: LUp, lan_integral_down: LDn, lan_high_up: hpU, lan_high_down: hpD, lan_off_up: abU, lan_off_down: abD },
       devices: Object.keys(S.cls).reduce((acc, k) => {
         let s = S.cls[k], cC = cI[k];
-        acc[k] = { up: Math.max(0, (s.lU || 0) - (s.uB || 0)), down: Math.max(0, (s.lD || 0) - (s.dB || 0)), integral_up: s.intUp || 0, integral_down: s.intDn || 0, status: s.aR ? "off" : (CONFIG.portMap[cC?.iface] || cC?.iface || "未知接口"), name: cC?.name || k, ip: cC?.ip || "", raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0 };
+        acc[k] = { up: Math.max(0, (s.lU || 0) - (s.uB || 0)), down: Math.max(0, (s.lD || 0) - (s.dB || 0)), integral_up: s.intUp || 0, integral_down: s.intDn || 0, status: cC ? (CONFIG.portMap[cC.iface] || cC.iface || "未知接口") : "off", name: cC?.name || s.name || k, ip: cC?.ip || "", raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0 };
         return acc;
       }, {})
     };
@@ -884,12 +885,7 @@ if (!window.gegeBActivated) {
     bVD(o, {}).then(() => rSD());};
 
   window.gegeBActivated = !1;
-  window.gegeEngineRunning = !1;
-  window.gegeLastDevCount = -1;
-  window.gegeLastMeshDevCount = -1;
   window.gegeHiddenDevices = {};
-  window.gegeTimerStarted = !1;
-  window.gegeSyncAnchor = 0;
   window.gegeTickCount = 0;
   window.gegeMasterTimer = null;
  
