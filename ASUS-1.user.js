@@ -2,7 +2,7 @@
 // @name            华硕路由器增强
 // @name:en         Bro-Stat-ASUS
 // @namespace       ucxn
-// @version         5.9.7-beta
+// @version         5.9.7
 // @description     哥哥科技 QQ群 680464365
 // @description:en  https://github.com/ucxn/Bro-Stat
 // @author          哥哥科技 space.bilibili.com/501430041
@@ -206,8 +206,9 @@ async function rSD() {
       // 暴力剥离上古时代 JS 数组并转为 JSON 对象
       let rT_match = text.match(/router_traffic\s*=\s*(\[.*\])/);
       let aT_match = text.match(/array_traffic\s*=\s*(\[.*\])/);
-      let rT = rT_match ? JSON.parse(rT_match[1]) : [0, 0];
-      let aT = aT_match ? JSON.parse(aT_match[1]) : [];
+      if (!rT_match || !aT_match) { console.warn('[ASUS] getTraffic 响应结构无效，保持上次真值'); return; }
+      let rT = JSON.parse(rT_match[1]), aT = JSON.parse(aT_match[1]);
+      if (!Array.isArray(rT) || rT.length < 2 || !Array.isArray(aT)) { console.warn('[ASUS] getTraffic 数据结构无效，保持上次真值'); return; }
 
       S.oWU = (+rT[0] || 0) * 8; S.oWD = (+rT[1] || 0) * 8; 
       S.bWU ??= S.oWU; S.bWD ??= S.oWD;
